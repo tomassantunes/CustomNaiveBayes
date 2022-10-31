@@ -1,1 +1,1 @@
-# trabalho-aa
+# Repositório para o trabalho de Aprendizagem Automática
