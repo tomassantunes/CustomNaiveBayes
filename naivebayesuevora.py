@@ -91,6 +91,8 @@ X, y = pre_processing(data_train)
 
 nbue.fit(X, y)
 
+print(nbue.class_priors)
+print(nbue.likelihoods)
 print(nbue.pred_priors)
 
 # https://medium.com/@rangavamsi5/na%C3%AFve-bayes-algorithm-implementation-from-scratch-in-python-7b2cc39268b9
