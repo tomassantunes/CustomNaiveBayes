@@ -18,7 +18,10 @@ class NaiveBayesUevora:
         self.pred_priors = {}
         
         self.train_size = 0
+        self.test_size = 0
         self.num_feats = 0
+
+        self.y_train = []
 
         self.alpha = int(input("Defina o alpha a usar: "))
            
@@ -29,6 +32,7 @@ class NaiveBayesUevora:
         self.features = list(X.columns)
         self.train_size = X.shape[0]
         self.num_feats = X.shape[1]
+        self.y_train = y
 
         for feature in self.features:
             self.likelihoods[feature] = {}
@@ -38,12 +42,12 @@ class NaiveBayesUevora:
         self.calc_likelihoods()
         self.calc_predictor_prior()
 
-    def calc_class_prior(self):
+    def calc_class_prior(self): # apenas class principal (Class)
         for i in np.unique(y):
             z = sum(y == i)
             self.class_priors[i] = z / self.train_size
 
-    def calc_likelihoods(self):
+    def calc_likelihoods(self): # probabilidade de class principal com restos das classes
         for feature in self.features:
             d = len(np.unique(X[feature]))
             
@@ -63,20 +67,64 @@ class NaiveBayesUevora:
 
                     self.likelihoods[feature][str(j) + '_' + str(l)] = self.estimador(xi, N, d)
 
-    def calc_predictor_prior(self):
+    def calc_predictor_prior(self): # probabilidade das outras classes existirem
         for feature in self.features:
             priors = np.unique(X[feature])
             
             for i in priors:
                 count = 0
-
+    
                 for j in X[feature]:
-                    if j == i:
+                    if(j == i):
                         count += 1
                 
                 self.pred_priors[feature][i] = count / self.train_size
 
-    # def predict(self, X, y):
+    def check_attribute(self, X, attr, feature, class_name=""):
+        if class_name != "":
+            x = f"{attr}_{class_name}"
+            if x not in self.likelihoods[feature]:
+                xi = 0
+                for k in X[feature]:
+                    if(k == attr):
+                        xi += 1
+
+                return self.estimador(xi, 1, len(np.unique(X[feature])))
+            return self.likelihoods[feature][x]
+
+        if attr not in self.pred_priors[feature]:
+            count = 0
+
+            for i in X[feature]:
+
+                if (i == attr):
+                    count += 1
+
+            return count / self.test_size
+        return self.pred_priors[feature][attr]
+
+    def predict(self, X):
+        y = np.unique(self.y_train)
+        self.test_size = X.shape[0]
+        results = []
+
+        for j in range(self.test_size):
+            probs_outcome = {}
+
+            for i in y:
+                tmpTop = 1
+                tmpBot = 1
+
+                for feature in self.features:
+                    tmpTop *= self.check_attribute(X, X[feature][j], feature, i)
+                    tmpBot *= self.check_attribute(X, X[feature][j], feature)
+
+                probs_outcome[i] = (tmpTop * self.class_priors[i]) / tmpBot
+
+            result = max(probs_outcome, key = lambda x: probs_outcome[x])
+            results.append(result)
+        
+        print(results)
 
     # def accuracy_score(self, X, y):
 
@@ -91,8 +139,12 @@ X, y = pre_processing(data_train)
 
 nbue.fit(X, y)
 
-print(nbue.class_priors)
-print(nbue.likelihoods)
-print(nbue.pred_priors)
+X_test, y_test = pre_processing(data_test)
+
+# print(nbue.class_priors)
+# print(nbue.likelihoods)
+# print(nbue.pred_priors)
+
+nbue.predict(X_test)
 
 # https://medium.com/@rangavamsi5/na%C3%AFve-bayes-algorithm-implementation-from-scratch-in-python-7b2cc39268b9
