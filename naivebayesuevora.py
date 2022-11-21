@@ -26,7 +26,7 @@ class NaiveBayesUevora:
         self.alpha = int(input("Defina o alpha a usar: "))
            
     def estimador(self, xi, N, d) -> float:
-        return (xi + self.alpha) / (N + self.alpha*d)
+        return (xi + self.alpha) / (N + (self.alpha*d))
 
     def fit(self, X, y):
         self.features = list(X.columns)
@@ -52,15 +52,15 @@ class NaiveBayesUevora:
             d = len(np.unique(X[feature]))
             
             for j in np.unique(X[feature]):
-                xi = 0
-
-                for k in X[feature]:
-                    if(j == k):
-                        xi += 1
-
+                
                 for l in np.unique(y):
                     N = 0
-                
+                    xi = 0
+
+                    for k in range(self.train_size):
+                        if(X[feature][k] == j and y[k] == l):
+                            xi += 1
+
                     for n in y:
                         if(n == l):
                             N += 1
@@ -124,7 +124,7 @@ class NaiveBayesUevora:
             result = max(probs_outcome, key = lambda x: probs_outcome[x])
             results.append(result)
         
-        print(results)
+        return results
 
     # def accuracy_score(self, X, y):
 
