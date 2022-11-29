@@ -117,11 +117,13 @@ class NaiveBayesUevora:
 
                 for feature in self.features:
                     tmpTop *= self.check_attribute(X, X[feature][j], feature, i)
-                    tmpBot *= self.check_attribute(X, X[feature][j], feature)
+                    # tmpBot *= self.check_attribute(X, X[feature][j], feature)
+                    tmpBot *= 1
 
                 probs_outcome[i] = (tmpTop * self.class_priors[i]) / tmpBot
 
             result = max(probs_outcome, key = lambda x: probs_outcome[x])
+            print(probs_outcome)
             results.append(result)
         
         return results
@@ -141,9 +143,9 @@ nbue.fit(X, y)
 
 X_test, y_test = pre_processing(data_test)
 
-# print(nbue.class_priors)
-# print(nbue.likelihoods)
-# print(nbue.pred_priors)
+print(nbue.class_priors)
+print(nbue.likelihoods)
+print(nbue.pred_priors)
 
 nbue.predict(X_test)
 
