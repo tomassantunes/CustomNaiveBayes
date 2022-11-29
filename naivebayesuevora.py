@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sklearn.metrics import confusion_matrix
 
 def pre_processing(d):
 
@@ -140,15 +141,13 @@ class NaiveBayesUevora:
             numberOfFakePositives=0
             for j in range(numberOfClasses):
                 if j != i:
-                    numberOfFakePositives += confusionMatrix[i][j]
+                    numberOfFakePositives += confusionMatrix[j][i]
             precision= float(confusionMatrix[i][i]/ (numberOfFakePositives + confusionMatrix[i][i]))
             precisions.append(precision)
 
+        print(precisions)
         return float(sum(precisions)/ len(precisions))
         
-
-
-
 
 nbue = NaiveBayesUevora()
 
@@ -169,7 +168,6 @@ prediction = nbue.predict(X_test)
 print(prediction)
 print(nbue.accuracy_score(prediction,y_test))
 
-from sklearn.metrics import confusion_matrix
 print(confusion_matrix(y_test, prediction))
 print(nbue.precision_score(y_test, prediction))
 
