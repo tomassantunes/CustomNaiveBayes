@@ -2,13 +2,6 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import confusion_matrix
 
-def pre_processing(d):
-
-    X = d.drop([d.columns[0]], axis = 1)
-    y = d[d.columns[0]]
-
-    return X, y
-
 class NaiveBayesUevora:
     alpha = 0
     def __init__(self):
@@ -39,16 +32,16 @@ class NaiveBayesUevora:
             self.likelihoods[feature] = {}
             self.pred_priors[feature] = {}
 
-        self.calc_class_prior()
-        self.calc_likelihoods()
-        self.calc_predictor_prior()
+        self.calc_class_prior(X, y)
+        self.calc_likelihoods(X, y)
+        self.calc_predictor_prior(X, y)
 
-    def calc_class_prior(self): # apenas class principal (Class)
+    def calc_class_prior(self, X, y): # apenas class principal (Class)
         for i in np.unique(y):
             z = sum(y == i)
             self.class_priors[i] = z / self.train_size
 
-    def calc_likelihoods(self): # probabilidade de class principal com restos das classes
+    def calc_likelihoods(self, X, y): # probabilidade de class principal com restos das classes
         for feature in self.features:
             d = len(np.unique(X[feature]))
             
@@ -68,7 +61,7 @@ class NaiveBayesUevora:
 
                     self.likelihoods[feature][str(j) + '_' + str(l)] = self.estimador(xi, N, d)
 
-    def calc_predictor_prior(self): # probabilidade das outras classes existirem
+    def calc_predictor_prior(self, X, y): # probabilidade das outras classes existirem
         for feature in self.features:
             priors = np.unique(X[feature])
             
@@ -82,6 +75,7 @@ class NaiveBayesUevora:
                 self.pred_priors[feature][i] = count / self.train_size
 
     def check_attribute(self, X, attr, feature, class_name=""):
+
         if class_name != "":
             x = f"{attr}_{class_name}"
             if x not in self.likelihoods[feature]:
@@ -113,18 +107,15 @@ class NaiveBayesUevora:
             probs_outcome = {}
 
             for i in y:
-                tmpTop = 1
-                tmpBot = 1
+                tmp = 1
 
                 for feature in self.features:
-                    tmpTop *= self.check_attribute(X, X[feature][j], feature, i)
-                    # tmpBot *= self.check_attribute(X, X[feature][j], feature)
-                    tmpBot *= 1
+                    # X[feature].keys()[j] -> ir buscar as keys do split 
+                    tmp *= self.check_attribute(X, X[feature][X[feature].keys()[j]], feature, i)
 
-                probs_outcome[i] = (tmpTop * self.class_priors[i]) / tmpBot
+                probs_outcome[i] = (tmp * self.class_priors[i])
 
             result = max(probs_outcome, key = lambda x: probs_outcome[x])
-            #print(probs_outcome)
             results.append(result)
         
         return results
@@ -134,7 +125,7 @@ class NaiveBayesUevora:
 
     #precision(for each)= truePositives / truePositives + FalsePositives
     def precision_score(self, y_test, prediction):
-        confusionMatrix= confusion_matrix(y_test, prediction)
+        confusionMatrix = confusion_matrix(y_test, prediction)
         precisions=[]
         numberOfClasses = len(confusionMatrix[0])
         for i in range(numberOfClasses):
@@ -145,30 +136,4 @@ class NaiveBayesUevora:
             precision= float(confusionMatrix[i][i]/ (numberOfFakePositives + confusionMatrix[i][i]))
             precisions.append(precision)
 
-        print(precisions)
         return float(sum(precisions)/ len(precisions))
-        
-
-nbue = NaiveBayesUevora()
-
-data_train = pd.read_csv("breast.cancer-train.csv")
-data_test = pd.read_csv("breast-cancer-test.csv")
-
-X, y = pre_processing(data_train)
-
-nbue.fit(X, y)
-
-X_test, y_test = pre_processing(data_test)
-
-# print(nbue.class_priors)
-#print(nbue.likelihoods)
-#print(nbue.pred_priors)
-
-prediction = nbue.predict(X_test)
-print(prediction)
-print(nbue.accuracy_score(prediction,y_test))
-
-print(confusion_matrix(y_test, prediction))
-print(nbue.precision_score(y_test, prediction))
-
-# https://medium.com/@rangavamsi5/na%C3%AFve-bayes-algorithm-implementation-from-scratch-in-python-7b2cc39268b9
