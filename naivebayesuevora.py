@@ -123,14 +123,18 @@ class NaiveBayesUevora:
                 probs_outcome[i] = (tmpTop * self.class_priors[i]) / tmpBot
 
             result = max(probs_outcome, key = lambda x: probs_outcome[x])
-            print(probs_outcome)
+            #print(probs_outcome)
             results.append(result)
         
         return results
 
-    # def accuracy_score(self, X, y):
+    def accuracy_score(self, Y_pred, Y_test):
+        return float(sum(Y_pred==Y_test))/float(len(Y_test))
 
-    # def precision_score(self, X, y):
+    #precision(for each)= truePositives / truePositives + FalsePositives
+    #def precision_score(self, X, y):
+
+
 
 nbue = NaiveBayesUevora()
 
@@ -143,10 +147,15 @@ nbue.fit(X, y)
 
 X_test, y_test = pre_processing(data_test)
 
-print(nbue.class_priors)
-print(nbue.likelihoods)
-print(nbue.pred_priors)
+# print(nbue.class_priors)
+#print(nbue.likelihoods)
+#print(nbue.pred_priors)
 
-nbue.predict(X_test)
+prediction = nbue.predict(X_test)
+print(prediction)
+print(nbue.accuracy_score(prediction,y_test))
+
+from sklearn.metrics import confusion_matrix
+print(confusion_matrix(y_test, prediction))
 
 # https://medium.com/@rangavamsi5/na%C3%AFve-bayes-algorithm-implementation-from-scratch-in-python-7b2cc39268b9
