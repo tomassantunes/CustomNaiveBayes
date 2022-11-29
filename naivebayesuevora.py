@@ -132,7 +132,21 @@ class NaiveBayesUevora:
         return float(sum(Y_pred==Y_test))/float(len(Y_test))
 
     #precision(for each)= truePositives / truePositives + FalsePositives
-    #def precision_score(self, X, y):
+    def precision_score(self, y_test, prediction):
+        confusionMatrix= confusion_matrix(y_test, prediction)
+        precisions=[]
+        numberOfClasses = len(confusionMatrix[0])
+        for i in range(numberOfClasses):
+            numberOfFakePositives=0
+            for j in range(numberOfClasses):
+                if j != i:
+                    numberOfFakePositives += confusionMatrix[i][j]
+            precision= float(confusionMatrix[i][i]/ (numberOfFakePositives + confusionMatrix[i][i]))
+            precisions.append(precision)
+
+        return float(sum(precisions)/ len(precisions))
+        
+
 
 
 
@@ -157,5 +171,6 @@ print(nbue.accuracy_score(prediction,y_test))
 
 from sklearn.metrics import confusion_matrix
 print(confusion_matrix(y_test, prediction))
+print(nbue.precision_score(y_test, prediction))
 
 # https://medium.com/@rangavamsi5/na%C3%AFve-bayes-algorithm-implementation-from-scratch-in-python-7b2cc39268b9
