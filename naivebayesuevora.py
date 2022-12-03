@@ -110,7 +110,7 @@ class NaiveBayesUevora:
                 tmp = 1
 
                 for feature in self.features:
-                    # X[feature].keys()[j] -> ir buscar as keys do split 
+                    # X[feature].keys()[j] -> ir buscar as keys do split
                     tmp *= self.check_attribute(X, X[feature][X[feature].keys()[j]], feature, i)
 
                 probs_outcome[i] = (tmp * self.class_priors[i])
