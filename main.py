@@ -21,9 +21,9 @@ nbue.fit(X, y)
 
 X_test, y_test = pre_processing(data_test)
 
-print(nbue.class_priors)
-print(nbue.likelihoods)
-print(nbue.pred_priors)
+# print(nbue.class_priors)
+# print(nbue.likelihoods)
+# print(nbue.pred_priors)
 
 prediction = nbue.predict(X_test)
 print(prediction)
@@ -43,9 +43,9 @@ nbue2.fit(X2, y2)
 
 X_test2, y_test2 = pre_processing(data_test2)
 
-print(nbue2.class_priors)
-print(nbue2.likelihoods)
-print(nbue2.pred_priors)
+# print(nbue2.class_priors)
+# print(nbue2.likelihoods)
+# print(nbue2.pred_priors)
 
 prediction2 = nbue2.predict(X_test2)
 print(prediction2)
@@ -65,9 +65,9 @@ nbue3.fit(X3, y3)
 
 X_train3, X_test3, y_train3, y_test3 = train_test_split(X3, y3)
 
-print(nbue3.class_priors)
-print(nbue3.likelihoods)
-print(nbue3.pred_priors)
+# print(nbue3.class_priors)
+# print(nbue3.likelihoods)
+# print(nbue3.pred_priors)
 
 prediction3 = nbue3.predict(X_test3)
 print(prediction3)
